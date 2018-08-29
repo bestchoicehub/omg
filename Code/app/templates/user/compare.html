@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<!--[if lt IE 7]>
+<html class="no-bootstrap lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-bootstrap lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-bootstrap lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+{% import "bootstrap/wtf.html" as wtf %}
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Compare</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="../../static/css/bootstrap3/bootstrap.css">
+
+    <!-- Main JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="../../static/js/bootstrap3/bootstrap.js"></script>
+
+    <!-- Respond.bootstrap for IE 8 or less only -->
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="bootstrap/vendor/respond.min.bootstrap"></script>
+    <![endif]-->
+
+    <style>
+        .tab-contain {
+            margin: 5px auto;
+            width: 80%;
+            padding: 10px;
+            background: white;
+        }
+
+        #tabs {
+            overflow: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #tabs li {
+            float: left;
+            margin: 0;
+        }
+
+        .li a {
+            position: relative;
+            background: #3945a7;
+            padding: 10px 110px;
+            float: left;
+            text-decoration: none;
+            color: #444;
+            /*text-shadow: 0 1px 0 rgba(255, 255, 255, .8);*/
+            /* border-radius: 20px 20px 0 0;*/
+            box-shadow: 0 2px 2px rgba(0, 0, 0, .4);
+        }
+
+        .current a {
+            outline: 0;
+            background: navy;
+            z-index: 4;
+        }
+
+        .hoverItem a {
+            background: navy;
+        }
+
+        #content {
+            background: #fff;
+            padding-top: 10px;
+            height: 220px;
+            position: relative;
+            border-radius: 0 5px 5px 5px;
+            box-shadow: 0 -2px 3px -2px rgba(0, 0, 0, .5);
+        }
+
+
+        .show {
+            display: block;
+        }
+
+        .h3-responsive {
+            font-size: 22px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .quicktabs-tabs {
+            background-color: #3945a7;
+            padding-left: 0;
+            margin-bottom: 0;
+            list-style: none;
+            text-align: center;
+        }
+
+        .quicktabs-style-arrows {
+            border: 0 none;
+            margin-left: 0;
+            margin-right: 0;
+            padding: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        #table{
+            margin-top: 50px;
+        }
+
+        #myTabContent{
+            margin-top: 5px;
+        }
+
+        .inline{
+            display: inline-block;
+        }
+
+        @media (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) {
+            #myTabContent{
+                width: 370px;
+                overflow:auto;
+            }
+
+            .btn{
+                margin-top:5px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<header role="banner">
+    <nav role="navigation" class="navbar navbar-static-top navbar-default" style="margin-bottom:0px">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                    <img src="../../static/img/logo.png" alt="BestChoice'" width="120" style="margin-top:-9px">
+                </a>
+            </div>
+
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav pull-left">
+                    <li><a href='{{ url_for('main.index') }}'>
+                        <span class="glyphicon glyphicon-home"></span> Home
+                    </a></li>
+                    <li><a href='{{ url_for('main.result', like='%Dublin%', coordination ='53.3498123,-6.2624488') }}'>
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </a></li>
+                    <li><a href='{{ url_for('main.rank') }}'>
+                        <span class="glyphicon glyphicon-sort-by-order"></span> Rank
+                    </a></li>
+                    <li class="active"><a href='{{ url_for('operation.compare') }}'>
+                        <span class="glyphicon glyphicon-tasks"></span> Compare
+                    </a></li>
+                </ul>
+                <ul class="nav navbar-nav pull-right">
+                    <li class="dropdown">
+                        {% if current_user.is_authenticated %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                {% if current_user.photo %}
+                                    <img src="{{ current_user.photo }}" height="23" width="23">
+                                {% else %}
+                                    <img class="img-rounded profile-thumbnail"
+                                         src="../../static/avatars/default_avatar.jpg" height="23"
+                                         width="23">
+                                {% endif %}
+                                {{ current_user.username }} <b class="caret"></b>
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                {% if current_user.login_type != 'website' %}
+                                    <li><a href="{{ url_for('operation.user', username=current_user.username) }}">Profile</a>
+                                    </li>
+                                    {#                                    <li><a href="{{ url_for('operation.following', username=current_user.username)}}">Watching List</a></li>#}
+                                    <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
+                                {% else %}
+                                    <li><a href="{{ url_for('operation.user', username=current_user.username) }}">Profile</a>
+                                    </li>
+                                    {#                                    <li><a href="{{ url_for('operation.following', username=current_user.username)}}">Watching List</a></li>#}
+                                    <li><a href="{{ url_for('operation.change_password') }}">Change password</a></li>
+                                    <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
+                                {% endif %}
+                            </ul>
+
+                            </li>
+                        {% else %}
+                            <li><a href="{{ url_for('auth.login',type = 'compare') }}">Log In</a></li>
+                        {% endif %}
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container -->
+    </nav>
+</header>
+
+<script>
+    function remove(self) {
+        var td = $(self).parent().parent();
+        var option = '.'+ td.attr("class");
+        //console.log(td.attr("class"));
+        ajax_uncompare(td.attr("id"));
+        $(option).remove();
+
+    }
+
+    function ajax_uncompare(name) {
+        req = $.ajax({
+            url: "/remove_comparison/" + name,
+            success: function (data) {
+                if (data.result == 'success') {
+                    //console.log("Removed!")
+                }
+            }
+        });
+
+        req.done();
+    }
+
+</script>
+
+<main role="main">
+
+    <div id="table" class="row">
+        <div class="col-md-1"></div>
+
+        <div class="col-md-10">
+            <ul id="myTab" class="nav nav-tabs">
+                <li class="active">
+                    <a href="#info" data-toggle="tab">
+                    Basic Information
+                    </a>
+                </li>
+                <li>
+                    <a href="#rank" data-toggle="tab">
+                        Rank
+                    </a>
+                </li>
+                <li>
+                    <a href="#rate" data-toggle="tab">
+                        Progression Rate
+                    </a>
+                </li>
+            </ul>
+
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane fade in active" id="info">
+                    <div id="tab1" class="item show">
+                        <table class="table table-striped table-hover" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>School Name</td>
+
+                                {% for school in schools %}
+                                    <td class={{ school.roll_number }} id={{ school.place_id }}>
+                                        <div class="field-item even">
+                                            <a href="{{ url_for('main.school_detail', place_id=school.place_id, official_school_name=school.official_school_name) }}" target="_blank">
+                                            <img typeof="foaf:Image"
+                                                 src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/home/{{ school.official_school_name }}.jpeg"
+                                                 width="150" height="100" alt={{ school.official_school_name }}/></a>
+                                        </div>
+                                        <span class="compare-item">
+                                            <a href="{{ url_for('main.school_detail', place_id=school.place_id, official_school_name=school.official_school_name) }}" target="_blank">
+                                            {{ school.official_school_name }}
+                                            </a><br>
+                                            <a class="inline" href="javascript:void(0)" onclick="remove(this)">
+                                                <div class="caption inline" ><span class="label label-danger">Remove</span></div>
+                                            </a>
+                                        </span>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>Address</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}"> {{ school.address1 }} </td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>School Gender</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}"> {{ school.school_gender }} </td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>Religion</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}">  {{ school.religion }} </td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>Total number of pupils</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}"> {{ school.total_pupil }} </td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>Official Website</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}"> <a href =  "http://{{ school.website }}">http://{{ school.website }}</a> </td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>Fees</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}"> {{ school.fee }}</td>
+                                {% endfor %}
+                            </tr>
+
+                            <tr>
+                                <td>Student-Teacher Ratio</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}">
+                                        {% if school.ST_ratio %}
+                                            {{ school.ST_ratio }}
+                                        {% else %}
+                                            No Data
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="rank">
+                    <div id="tab2" class="item">
+                        <table class="table table-striped table-hover" width="100%">
+                            <tbody>
+                                <tr>
+                                    <td>School Name</td>
+                                    {% for school in schools %}
+                                        <td class="{{ school.roll_number }}" id="{{ school.place_id }}">
+                                            <div class="field-item even">
+                                                <a href="{{ url_for('main.school_detail', place_id=school.place_id, official_school_name=school.official_school_name) }}" target="_blank">
+                                                <img typeof="foaf:Image"
+                                                     src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/home/{{ school.official_school_name }}.jpeg"
+                                                     width="150" height="100" alt={{ school.official_school_name }}/></a>
+                                            </div>
+                                            <span class="compare-item inline">
+                                                <a href="#">{{ school.official_school_name }}</a><br>
+                                                <a class="inline" href="javascript:void(0)" onclick="remove(this)">
+                                                    <div class="caption inline" ><span class="label label-danger">Remove</span></div>
+                                                </a>
+                                            </span>
+
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>Rank in 2017</td>
+                                    {% for school in schools %}
+                                        <td class="{{ school.roll_number }}">
+                                            {% if school.rank2017 %}
+                                                {{ school.rank2017 }}
+                                            {% else %}
+                                                No Data
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>Rank in 2016</td>
+                                    {% for school in schools %}
+                                        <td class="{{ school.roll_number }}">
+                                            {% if school.rank2016 %}
+                                                {{ school.rank2016 }}
+                                            {% else %}
+                                                No Data
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="rate">
+                    <div id="tab3" class="item">
+                        <table class="table table-striped table-hover" width="100%">
+                            <tbody>
+                                <tr>
+                                    <td>School Name</td>
+
+                                    {% for school in schools %}
+                                        <td class="{{ school.roll_number }}" id="{{ school.place_id }}">
+                                            <div class="field-item even">
+                                                <a href="{{ url_for('main.school_detail', place_id=school.place_id, official_school_name=school.official_school_name) }}" target="_blank">
+                                                <img typeof="foaf:Image"
+                                                     src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/home/{{ school.official_school_name }}.jpeg"
+                                                     width="150" height="100" alt={{ school.official_school_name }}/></a>
+                                            </div>
+                                            <span class="compare-item">
+                                                <a href="#">{{ school.official_school_name }}</a><br>
+                                                <a class="inline" href="javascript:void(0)" onclick="remove(this)">
+                                                    <div class="caption inline" ><span class="label label-danger">Remove</span></div>
+                                                </a>
+                                            </span>
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                                <tr>
+                                    <td>2017 Progression Rate</td>
+                                    {% for school in schools %}
+                                        <td class="{{ school.roll_number }}">
+                                            {% if school.progression2017 %}
+                                                {{ school.progression2017 }}
+                                            {% else %}
+                                                No Data
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+
+                                <tr>
+                                    <td>2016 Progression Rate</td>
+                                    {% for school in schools %}
+                                        <td class="{{ school.roll_number }}">
+                                            {% if school.progression2016 %}
+                                                {{ school.progression2016 }}
+                                            {% else %}
+                                                No Data
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+
+                                <tr>
+                                <td>2015 Progression Rate</td>
+                                {% for school in schools %}
+                                    <td class="{{ school.roll_number }}">
+                                        {% if school.progression2015 %}
+                                            {{ school.progression2015 }}
+                                        {% else %}
+                                            No Data
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-1"></div>
+
+
+    </div>
+
+
+</main>
+
+
+</body>
+</html>

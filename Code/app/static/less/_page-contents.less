@@ -1,0 +1,84 @@
+//
+// Page Contents
+// --------------------------
+
+main {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+.home main [class*="col-"] { // only in homepage
+  h1, h2, h3, h4 {
+    clear: both;
+    padding-top: 20px;
+    @media (min-width: @screen-sm-min) {
+      &:first-child {
+        margin-top: 0;
+        padding-top: 0;
+      }
+    }
+  }
+  .content-primary {
+    font-size: @font-size-large;
+  }
+  .content-tertiary {
+    font-size: @font-size-small;
+  }
+  // Make columns clear floats in narrow viewport single-column layout
+  @media (max-width: @screen-sm-min) {
+    [class*="col-"] {
+      clear: both;
+    }
+  }
+}
+
+#welcome {
+  height: 200px;
+  background-color: #191919;
+  color: #fff;
+  position: relative;
+  .welcome-message {
+    background-color: hsla(0, 0, 1%, 0.4); // translucent overlay
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px 40px;
+    strong {
+      font-size: 1.5em;
+      text-transform: uppercase;
+    }
+  }
+  .btn {
+    margin-top: 16px;
+  }
+  @media (max-width: @screen-sm-max) {
+    background: #191919 url('../img/search/background1.jpg') center center no-repeat;
+  }
+  @media (min-width: @screen-sm-min) {
+    height: 480px;
+    .container {
+      position: relative;
+    }
+
+    .welcome-message {
+      right: 20%;
+      bottom: auto;
+      strong {
+        display: block;
+      }
+    }
+  }
+  @media (min-width: @screen-md-min) {
+    height: 540px;
+    background: #191919 url('../img/search/background1.jpg') center center no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    .welcome-message {
+      right: 50%;
+    }
+  }
+}

@@ -1,0 +1,18 @@
+.like{
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 99;
+}
+.like.no{
+  background: url(../img/heart_no.png) no-repeat;
+  background-size: cover;
+}
+.like.yes{
+  background: url(../img/heart_yes.png) no-repeat ;
+  background-size: cover;
+}

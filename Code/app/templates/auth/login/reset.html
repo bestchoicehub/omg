@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+{#<script src="/js/home.js"></script>#}
+<script src="../../../static/js/vendor/jquery-1.10.2.min.js"></script>
+<html lang="en">
+{% import "bootstrap/wtf.html" as wtf %}
+
+<head>
+   <meta charset="UTF-8">
+    <title>Reset</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="../../../static/css/bootstrap3/bootstrap.css">
+    <!-- Modernizr -->
+    <script src="../../../static/js/vendor/modernizr-2.6.2.min.js"></script>
+    <!-- Respond.js for IE 8 or less only -->
+    <!--[if (lt IE 9) & (!IEMobile)]>
+        <script src="js/vendor/respond.src.js"></script>
+        <![endif]-->
+</head>
+
+{% include 'base.html' %}
+
+<main role="main">
+    <div class="container">
+        <div class="row">
+        <div class="col-md-3"></div>
+            <div class="col col-md-6 col-xs-10" style="margin-top: 160px">
+                <div class="modal-content">
+                    <div class="modal-header">
+{#                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>#}
+                        <h4 class="modal-title">
+                            Reset password
+                        </h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <form novalidate="novalidate" id="formSignUp" method="post">
+                            {{ form.hidden_tag() }}
+                            {{ wtf.form_errors(form, hiddens="only") }}
+
+                            <div id="errorSignUp">
+                                {% for message in get_flashed_messages() %}
+                                    <div class="alert alert-warning">
+                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="form-group">
+                                <label>Password</label>
+                                <div class="input-group" style="width:100%">
+{#                                    <span class="input-group-addon"><span#}
+{#                                            class="glyphicon glyphicon-lock"></span></span>#}
+                                    {#                                    <input class="form-control" placeholder="Enter your new password" name="passwordReset" id="password" type="password">#}
+                                    {{ wtf.form_field(form.new_password1) }}
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Password</label>
+                                <div class="input-group" style="width:100%">
+{#                                    <span class="input-group-addon"><span#}
+{#                                            class="glyphicon glyphicon-lock"></span></span>#}
+                                    {#                                    <input class="form-control" placeholder="Enter your new password" name="passwordReset" id="password" type="password">#}
+                                    {{ wtf.form_field(form.new_password2) }}
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnLogin" class="btn btn-primary"
+                                    style="width: 127px;text-align: center">Submit
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

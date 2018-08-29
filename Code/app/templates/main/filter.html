@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Search</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="../../static/css/bootstrap3/bootstrap.css">
+    <link rel="stylesheet" href="../../static/css/filter.css">
+
+    <!-- Modernizr -->
+    <script src="../../static/js/vendor/modernizr-2.6.2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGOu1MCWVAvOQ24l6-tOdRpXgKXEDWvYs&language=en&libraries=places">
+    </script>
+    <script src="../../static/js/filter.js"></script>
+    <script src="../../static/js/bootstrap3/bootstrap.js"></script>
+
+
+    <!-- Holder.js for project development only -->
+    <script src="../../static/js/vendor/holder.js"></script>
+
+    <!-- Essential Plugins and Main JavaScript File -->
+    <script src="../../static/js/plugins.js"></script>
+    <!-- Respond.js for IE 8 or less only -->
+    <!--[if (lt IE 9) & (!IEMobile)]>
+    <script src="js/vendor/respond.min.js"></script>
+    <script type="text/javascript">
+
+    <![endif]-->
+
+</head>
+
+
+<body class="products">
+
+<!--[if lte IE 7]>
+<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+<![endif]-->
+
+<header role="banner">
+    <nav role="navigation" class="navbar navbar-static-top navbar-default" style="margin-bottom:0px">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                    <img src="../../static/img/logo.png" alt="BestChoice'" width="120" style="margin-top:-9px">
+                </a>
+            </div>
+
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav pull-left">
+                    <li ><a href="{{ url_for('main.index') }}">
+                        <span class="glyphicon glyphicon-home"></span> Home
+                    </a></li>
+                    <li><a href="{{ url_for('main.result', like='%Dublin%', coordination ='53.3498123,-6.2624488') }}">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </a></li>
+                    <li ><a href="{{ url_for('main.rank') }}">
+                        <span class="glyphicon glyphicon-sort-by-order"></span> Rank
+                    </a></li>
+                    <li><a href="{{ url_for('operation.compare') }}">
+                        <span class="glyphicon glyphicon-tasks"></span> Compare
+                    </a></li>
+                </ul>
+                <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown">
+                        {% if current_user.is_authenticated %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                {% if current_user.photo %}
+                                    <img src="{{ current_user.photo }}" height="23" width="23">
+                                {% else %}
+                                    <img class="img-rounded profile-thumbnail"
+                                         src="../../static/avatars/default_avatar.jpg" height="23"
+                                         width="23">
+                                {% endif %}
+                                {{ current_user.username }} <b class="caret"></b>
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                {% if current_user.login_type != 'website' %}
+                                    <li><a href="{{ url_for('operation.user', username=current_user.username) }}">Profile</a></li>
+{#                                    <li><a href="{{ url_for('operation.following', username=current_user.username)}}">Watching List</a></li>#}
+                                    <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
+                                {% else %}
+                                    <li><a href="{{ url_for('operation.user', username=current_user.username) }}">Profile</a></li>
+{#                                    <li><a href="{{ url_for('operation.following', username=current_user.username)}}">Watching List</a></li>#}
+                                    <li><a href="{{ url_for('operation.change_password') }}">Change password</a></li>
+                                    <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
+                                {% endif %}
+                            </ul>
+
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url }}">Log In</a></li>
+                    {% endif %}
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container -->
+    </nav>
+</header>
+
+<script>
+
+    function search() {
+        var searchValue = $("#search").val();
+        //console.log(searchValue);
+
+        window.location.href = 'http://' + domain +'/search/' + searchValue;
+
+    }
+
+</script>
+<main role="main" style="padding-top: 0px">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>
+                <div class="row">
+                    <div class="col-md-3">
+                       <span>Search </span>
+                    </div>
+                    <div class="col-md-4">
+                        <div id="imaginary_container">
+                            <div class="input-group stylish-input-group">
+                                <input id="search" type="text" class="form-control" value="" placeholder="input the school name or address" >
+                                <span class="input-group-addon">
+                                    <button type="submit" onclick="search()">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </h1>
+
+            <h2>
+                <small>Current Search keywords: " <span id="keywords" style="color: #00b3ee;font-family: 'microsoft yahei', Arial, sans-serif;">{{ keyword }}</span> "</small>
+            </h2>
+        </div>
+
+        <div class="row">
+
+            <div id="filterholder" style="margin-bottom: 10px;" class="grid-options col-sm-3">
+
+                <form id="filter-panel" class="form-inline" role="form">
+
+                    <h3 style="font-size:30px;margin-top: 0px;">Selections
+                        <!-- Displays the button when it is on the mobile screen-->
+                        <button type="button" class="options-panel-toggle btn btn-success pull-right "
+                                data-toggle="collapse" data-target="#options-panel">
+                            <span class="glyphicon glyphicon-list"></span>
+                        </button>
+                    </h3>
+
+                    <div style="margin: 10px 8px 10px 6px;border-top:1px dotted #C0C0C0;"></div>
+
+                    <div id="options-panel" class="options-panel collapse in">
+                            <h4>Rank of graduation</h4>
+                            <p>
+                                <input type="radio" name="rank" value="" checked> No Restriction</br>
+                                <input type="radio" name="rank" value="Top 50"> Top 50</br>
+                                <input type="radio" name="rank" value="Top 100"> Top 100</br>
+                                <input type="radio" name="rank" value="Top 200"> Top 200</br>
+                                <input type="radio" name="rank" value="Top 500"> Top 500
+                            </p>
+
+                            <h4>Fee paying</h4>
+                            <p>
+                                <input type="radio" name="fee" value="" checked> No Restriction</br>
+                                <input type="radio" name="fee" value="Y"> Yes for Pay</br>
+                                <input type="radio" name="fee" value="N"> No paying
+                            </p>
+
+                            <h4>Gender</h4>
+                            <p>
+                                <input type="radio" name="gender" value="" checked> No Restriction</br>
+                                <input type="radio" name="gender" value="Girls"> Girls</br>
+                                <input type="radio" name="gender" value="Boys"> Boys</br>
+                                <input type="radio" name="gender" value="Mixed"> Mixed
+                            </p>
+
+
+
+                            <h4>Religion</h4>
+                            <p>
+                                <input type="radio" name="religion" value="" checked> No Restriction</br>
+                                <input type="radio" name="religion" value="CATHOLIC"> Catholic</br>
+                                <input type="radio" name="religion" value="CHURCH OF IRELAND"> Church of Ireland</br>
+                                <input type="radio" name="religion" value="JEWISH"> Jewish</br>
+                                <input type="radio" name="religion" value="METHODIST"> Methodist</br>
+                                <input type="radio" name="religion" value="MULTI DENOMINATIONAL"> Multi Denominational</br>
+                                <input type="radio" name="religion" value="INTER DENOMINATIONAL"> Inter Denominational
+                            </p>
+
+
+
+                            <h4>Result sort by</h4>
+                            <p>
+                                <input type="radio" name="sort" value="distance" checked> Distance</br>
+                                <input type="radio" name="sort" value="third_level"> Third level rate</br>
+                                <input type="radio" name="sort" value="university_rate"> University-going rate
+                            </p>
+
+                    </div>
+                </form>
+            </div>
+
+
+            <div id="listholder" class="col-sm-6">
+                <div id="list">
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-5"></div>
+                    <div class="col-md-3 row pagination-wrap">
+                        <div class="more" style="text-align: center">
+                            <a id="more" href="javascript:void(0)" name="1" onclick="loadPartialSchools(this);">
+                                <span>----More----</span>
+                            </a>
+                            <p></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- /.row -->
+
+            </div>
+
+
+            <div id="mapholder" style="padding:0px" class="col-sm-3">
+                <div id="map" style="height: 500px">
+
+                </div>
+            </div>
+
+        </div><!-- /.row -->
+
+        <script type="text/javascript">
+
+
+
+            var current_input_latlng = {};
+
+            {% if input_location != "unknown_location"%}
+                var string = "{{ input_location }}";
+                var current = string.split(",")
+                current_input_latlng.lat = parseFloat(current[0]);
+                current_input_latlng.lng = parseFloat(current[1]);
+            {% endif %}
+
+            initMap(current_input_latlng);
+
+        </script>
+
+    </div><!-- /.container -->
+</main>
+
+<script>
+
+    var currentPage = 1;
+    var NumPerPage = 6;
+    var totalPage = 1;
+
+
+    var filters = initFilters();
+    //console.log("Global filters: ");
+    //console.log(filters);
+    var totalSchools = initdata();
+    //console.log("Global totalSchools: ");
+    //console.log(totalSchools);
+    var sortedSchools = [];
+
+    loadSchools(totalSchools, filters);
+    filterControl();
+
+
+    var offsetTop = $('#mapholder').offset().top;
+
+    if($(window).width() >= 640) {
+        //scrolling($('#filterholder'),offsetTop);
+        scrolling($('#mapholder'), offsetTop);
+    }
+
+{#
+    function processData(datas){
+        var schools = [];
+        for(var i=0; i < datas.length; i++){
+            var school = {};
+            school.name = datas[i].official_school_name;
+
+            schools.push(school);
+        }
+
+        return schools;
+
+    }
+#}
+
+
+
+
+    function initdata() {
+        var schools = [];
+        {% for school in school_result %}
+                var school = {};
+                school.name = '{{ school[0].official_school_name }}';
+
+                school.img = 'https://s3-eu-west-1.amazonaws.com/bestchoiceimage/home/{{ school[0].official_school_name }}.jpeg';
+                process = '{{school[0].official_school_name}}';
+                process = process.replace(/[\ |\~|\`|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\-|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?|\、|\，|\；|\。|\？|\！|\“|\”|\‘|\’|\：|\（|\）|\─|\…|\—|\·|\《|\》]/g, "");
+                school.id = process;
+                school.url = '{{ url_for(".school_detail", place_id=school[0].place_id, official_school_name=school[0].official_school_name) }}';
+                school.address = '{{ school[0].address }}';
+                school.religion = '{{ school[0].religion }}';
+                school.sex = '{{ school[0].school_gender }}';
+                school.rank = '{{ school[1].rank }}';
+                school.fee = '{{ school[0].fee }}';
+                school.rate = '{{ school[0].Total_progression }}';
+                school.boys = '{{ school[0].total_boy }}';
+                school.girls = '{{ school[0].total_girl}}';
+                school.distance = '{{ school[0].distance}}';
+
+                {%if school[1].at_third_level %}
+                    school.third_level = {{ school[1].at_third_level }}; // school.third_level
+                {% else %}
+                    school.third_level = -1;
+                    {#//school.third_level ='{{ school[1].at_third_level }}';#}
+                {% endif %}
+
+                {%if school[1].at_university %}
+                    school.university_rate = {{ school[1].at_university }};// school.university_rate
+                {% else %}
+                    school.university_rate = -1;
+                    {#//school.university_rate = '{{ school[1].at_university }}';#}
+                {% endif %}
+
+                school.placeid = '{{ school[0].place_id}}';
+
+                schools.push(school);
+        {% endfor %}
+
+        //console.log("function initdata totalSchools: ");
+        //console.log(schools);
+        return schools;
+
+    }
+
+    // return selected and sorted Data
+    function getSelectedSchools(schools, filters){
+        var selectedData = [];
+
+        for (var i = 0; i < schools.length; i++) {
+            var flag = true;
+
+            //!(condition1 || condition2)，Does not satisfy condition1 or condition2,
+            // the data is not added to the collection to be rendered
+            if (!(filters.s_religion == schools[i].religion || filters.s_religion == "")) {
+                flag = false; //flag = false 表示不加入
+            }
+
+            if (!(filters.s_gender == schools[i].sex || filters.s_gender == "")) {
+                flag = false;
+            }
+
+            if (!(filters.s_fee == schools[i].fee || filters.s_fee == "")) {
+                flag = false;
+            }
+
+            var rank = schools[i].rank;
+            if (rank == "None" || rank == '') {
+                rank = 9999;
+            }
+            if (!(filters.s_rankStart < rank && rank <= filters.s_rankEnd)) {
+                flag = false;
+            }
+
+            if (flag) {
+                selectedData.push(schools[i]);
+            }
+        }
+
+        var flag = true;
+        if(filters.s_sort == 'distance'){
+            flag = false;
+        }
+
+        selectedData = Sort(selectedData,filters.s_sort, flag);
+
+        if(selectedData.length == 0){
+            totalPage = 1;
+        } else{
+            totalPage = Math.ceil(selectedData.length / NumPerPage);
+        }
+
+        //console.log("function getSelectedSchools totalPage: " + totalPage);
+
+        //sortedSchools = selectedData;
+
+        return selectedData;
+    };
+
+    // draw school lists 
+    function drawSchoolCardsAndMarkers(datas){
+        //console.log("function drawSchoolCardsAndMarkers: currentpage: " + currentPage);
+        //console.log("function drawSchoolCardsAndMarkers: selecteData: " );
+        //console.log(datas);
+
+        for (var i = (currentPage-1)*NumPerPage; i < currentPage*NumPerPage; i++) {
+            if(i < datas.length){
+               $("#list").append(drawSingleCardHtml(datas[i], i+1));
+               drawSingleMarker(datas[i].placeid);
+            }
+        }
+    }
+
+    // totalSchools =>selectedData, click selection pannel to reload the school list and map markers
+    function loadSchools(totalSchools, filters){
+        //console.log("function loadSchools: filters: ");
+        //console.log(filters);
+        
+        sortedSchools = getSelectedSchools(totalSchools, filters);
+        //console.log("function loadSchools: sortedSchools: ");
+        //console.log(sortedSchools);
+
+        for(var i=0; i<markers.length; i++){
+            markers[i].setMap(null);
+        }
+        markers = [];
+
+        $("#list").empty();
+        //console.log("function loadSchools: currentPage: "+ currentPage + " totalPage： "+ totalPage);
+        if (currentPage < totalPage ){
+            drawSchoolCardsAndMarkers(sortedSchools);
+        }else if (currentPage == totalPage){
+            drawSchoolCardsAndMarkers(sortedSchools);
+            superLinkLocked(true);
+        }
+        
+
+        
+        //drawMarkersByplaceIds();
+        if($(window).width() >= 640) {
+            //scrolling($('#filterholder'),offsetTop);
+            scrolling($('#mapholder'), offsetTop);
+        }
+
+    }
+
+    function resetSelection(){
+        $('#filter-panel')[0].reset();
+    }
+
+    // add click to generate filters and call loadSchools() to reload page
+    function filterControl(){
+        $("input[name='gender']").click(function () {
+            if ($(this).checked == true) {
+                $(this).checked = false;
+
+            } else {
+                $(this).checked = true;
+                filters.s_gender = $(this).val();
+                //console.log("input[name='gender']");
+                currentPage = 1;
+                superLinkLocked(false);
+                loadSchools(totalSchools, filters);
+            }
+        });
+
+        $("input[name='religion']").click(function () {
+            if ($(this).checked == true) {
+                $(this).checked = false;
+
+            } else {
+                $(this).checked = true;
+                filters.s_religion = $(this).val();
+                //console.log("input[name='religion']");
+                currentPage = 1;
+                superLinkLocked(false);
+                loadSchools(totalSchools, filters);
+            }
+
+        });
+
+        $("input[name='fee']").click(function () {
+            if ($(this).checked == true) {
+                $(this).checked = false;
+
+            } else {
+                $(this).checked = true;
+                filters.s_fee = $(this).val();
+                //console.log("input[name='fee']");
+                currentPage = 1;
+                superLinkLocked(false);
+                loadSchools(totalSchools, filters);
+            }
+
+        });
+
+        $("input[name='rank']").click(function () {
+                if ($(this).checked == true) {
+                    $(this).checked = false;
+
+                } else {
+                    $(this).checked = true;
+                    var rank = $(this).val();
+                    if (rank == "") {
+                        filters.s_rankStart = 0;
+                        filters.s_rankEnd = 9999;
+                    }
+                    if (rank == "Top 50") {
+                        filters.s_rankStart = 0;
+                        filters.s_rankEnd = 50;
+                    }
+                    if (rank == "Top 100") {
+                        filters.s_rankStart = 0;
+                        filters.s_rankEnd = 100;
+                    }
+                    if (rank == "Top 200") {
+                        filters.s_rankStart = 0;
+                        filters.s_rankEnd = 200;
+                    }
+                    if (rank == "Top 500") {
+                        filters.s_rankStart = 0;
+                        filters.s_rankEnd = 500;
+                    }
+                    //console.log('input[name=\'rank\']:');
+                    currentPage = 1;
+                    superLinkLocked(false);
+                    loadSchools(totalSchools, filters);
+                }
+
+            });
+
+        $("input[name='sort']").click(function () {
+            if ($(this).checked == true) {
+                $(this).checked = false;
+
+            }else{
+                $(this).checked = true;
+                filters.s_sort = $(this).val();
+                currentPage = 1;
+                superLinkLocked(false);
+                loadSchools(totalSchools, filters);
+            }
+        });
+
+    }
+
+
+    function initFilters(){
+        var filters = {};
+
+        filters.s_fee = '';
+        filters.s_gender = '';
+        filters.s_religion = '';
+        filters.s_sort = 'distance';
+
+        filters.s_rankStart = 0;
+        filters.s_rankEnd = 999999;
+
+        return filters;
+    }
+
+    function drawSingleCardHtml(data, index){
+        //console.log('function drawSingleCardHtml data: ');
+        //console.log(data);
+
+        var third_level = '';
+        var university_rate = '';
+        var _rank = '';
+
+        if(data.third_level == -1){
+            //Because the incoming variable is a reference variable, you cannot directly modify the data data!！
+            //data.third_level = 'No Data';
+            third_level = 'No Data ;';
+        }else {
+            third_level = data.third_level + " %;";
+        }
+
+        if(data.university_rate == -1){
+            //data.university_rate = 'No Data';
+            university_rate = 'No Data ;';
+        } else {
+            university_rate = data.university_rate + " %;";
+        }
+
+        if (data.rank == "") {
+            _rank = 'No Data ;';
+        } else {
+            _rank = data.rank + ' ';
+        }
+
+        var html = '';
+        if(typeof(data) != 'undefined'){
+            html = html +
+                '<div class="school school-lg">' +
+                        '<div class="row">' +
+                            '<div id="imgholder" class="col-sm-5">' +
+                                    '<div >' +
+                                        '<a target="_blank" href="'+ data.url +'">' +
+                                            '<l-img" z-Index:-1; " src="'+ data.img +'">' +
+                                        '</a>' +
+                                    '</div>'+
+
+                                    '<div class="school-title">'+
+                                        '<a target="_blank" href="'+ data.url +'">' +
+                                            '<span>'+ 'No.'+index + '  ' + data.name +'</span>' +
+                                        '</a>'+
+                                    '</div>'+
+                                    '<a class="placeId" name="'+ data.placeid + '" href="javascript:void(0)" onclick="showSelectedLocation(this);">'+
+                                                '<span style="color: black;font-size: 14px; font-style: italic">☞ Show Location </span> </a>' +
+
+                            '</div>'+
+
+                            '<div id="infoholder" class="col-sm-7" style="padding-left: 5px">' +
+                                '<p><span style="font-weight:bold;color: black">Address: </span>' +
+                                    data.address +
+                                '</p>' +
+                                '<p><span style="font-weight:bold;color: black">Religion: </span>' +
+                                    data.religion +
+                                '</p>'+
+                                '<p><span style="font-weight:bold;color: black">Enrolment: </span>'+
+                                    'Boys: ' + data.boys + ", " +
+                                    'Girls: ' + data.girls +
+                                '</p>'+
+                                '<p><span style="font-weight:bold;color: black">Students at Third level: </span>' +
+                                    third_level +
+                                '</p>'+
+                                '<p><span style="font-weight:bold;color: black">Students at University: </span>' +
+                                    university_rate +
+                                '</p>'+
+                                '<p><span style="font-weight:bold;color: black">Rank: </span>' +
+                                    _rank +
+                                    '<span style="font-weight:bold;color: black">   Fees: </span>' +
+                                    data.fee + '</p>' +
+                                '<p><span style="font-weight:bold;color: black">  Distance from you: </span>' +
+                                    data.distance + ' km;' +
+                                '</p>' +
+                            '</div>' +
+                        '</div>'+
+                    '</div>';
+        }
+
+        return html;
+    }
+
+    // Pagination loading next school
+    function loadPartialSchools(obj){
+        //console.log("function getPartialSchools sortedSchools: ");
+        //console.log(sortedSchools);
+        currentPage = currentPage + 1;
+
+        if (currentPage < totalPage ){
+            drawSchoolCardsAndMarkers(sortedSchools);
+        } else if (currentPage == totalPage){
+            drawSchoolCardsAndMarkers(sortedSchools);
+            superLinkLocked(true);
+        }
+
+
+        //scrolling($('#filterholder'),offsetTop);
+
+         if($(window).width() >= 640){
+            var listholderHeight = $("#listholder").height();
+            $('#options-panel').height(listholderHeight);
+            scrolling($('#mapholder'),offsetTop);
+        }
+
+    }
+
+    function superLinkLocked(locked){
+        if(!locked){
+            $("#more").html("<span>----More----</span>");
+            $("#more").hover(function(){
+                $("#more").css("cursor","");
+                $("#more").disabled = "false";
+            });
+        }else{
+            $("#more").html("<span>----End----</span>");
+            $("#more").hover(function(){
+                $("#more").css("cursor","not-allowed");
+                $("#more").disabled = "true";
+            });
+        }
+    }
+
+
+</script>
+
+
+
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+<script>
+    var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+    (function (d, t) {
+        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g, s)
+    }(document, 'script'));
+
+</script>
+
+</body>
+
+</html>

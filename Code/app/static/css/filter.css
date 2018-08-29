@@ -1,0 +1,67 @@
+
+.stylish-input-group .input-group-addon{
+    background: white !important;
+}
+.stylish-input-group .form-control{
+	border-right:0;
+	box-shadow:0 0 0;
+	border-color:#ccc;
+}
+.stylish-input-group button{
+    border:0;
+    background:transparent;
+}
+
+.school-well{
+    border:2px solid grey;
+    border-radius: 5px;
+    padding: 10px;
+    padding-left: 10px;
+    margin: 5px;
+    margin-left: 0px;
+    margin-top: 0px
+}
+
+.school {
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color:#f9f9f9 ;
+    border: 1px solid #aeaeae1a;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+}
+.school-lg {
+    padding: 24px;
+    border-radius: 6px;
+    margin-left: 15px;
+}
+
+.school-title{
+    margin-left:2px;
+    margin-top:10px;
+    font-weight:bold;
+    font-size:15px;
+    width: 100%;
+}
+.more{
+    margin-left:2px;
+    margin-top:10px;
+    font-weight:bold;
+    font-size:20px;
+    width: 100%;
+    display: inline-block;
+}
+
+.school-img{
+    border-radius: 10px;
+    width: 160px;
+    height: 120px;
+}
+
+#filterholder{
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    padding-left: 15px;
+}

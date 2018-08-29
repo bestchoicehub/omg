@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" xmlns:Followers="https://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/html"> <!--<![endif]-->
+{% import "bootstrap/wtf.html" as wtf %}
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>School Detail</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="../../static/css/bootstrap3/bootstrap.css">
+    <link rel="stylesheet" href="../../static/css/like.css">
+    <link rel="stylesheet" href="../../static/css/star-rating/star-rating.css">
+    <link rel="stylesheet" href="../../static/css/details.css">
+
+    <!-- Main JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="../../static/js/pagination/jquery.twbsPagination.js"></script>
+    <script src="../../static/js/star-rating/star-rating.js"></script>
+    <script src="../../static/js/bootstrap3/bootstrap.js"></script>
+    <script src="../../static/js/jssor.slider.mini.js"></script>
+    <script src="../../static/js/school_detail.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.1.0/echarts.common.min.js"></script>
+
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGOu1MCWVAvOQ24l6-tOdRpXgKXEDWvYs&language=en">
+    </script>
+
+    <!-- Respond.js for IE 8 or less only -->
+    <!--[if (lt IE 9) & (!IEMobile)]>
+
+    <![endif]-->
+
+    <style>
+        .jumbotron {
+            background-image: url('https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img1/{{ school.official_school_name }}.jpeg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0px 0px;
+            height: 400px;
+            margin: 0;
+        }
+
+        @media (min-device-width : 300px) and (max-device-width : 675px) and (-webkit-min-device-pixel-ratio : 2){
+            .jumbotron {
+                background-image: url('https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img1/{{ school.official_school_name }}.jpeg');
+                background-repeat: no-repeat;
+                background-size: cover;
+                background-position: 0px 0px;
+                height: 300px;
+                margin: 0;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!--[if lte IE 7]>
+<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+<![endif]-->
+
+<header role="banner">
+    <nav role="navigation" class="navbar navbar-static-top navbar-default" style="margin-bottom:0px">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">
+                    <img src="../../static/img/logo.png" alt="BestChoice'" width="120" style="margin-top:-9px">
+                </a>
+            </div>
+
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav pull-left">
+                    <li class="active"><a href="{{ url_for('main.index') }}">
+                        <span class="glyphicon glyphicon-home"></span> Home
+                    </a></li>
+                    <li><a href="{{ url_for('main.result', like='%Dublin%', coordination ='53.3498123,-6.2624488') }}">
+                        <span class="glyphicon glyphicon-search"></span> Search
+                    </a></li>
+                    <li><a href="{{ url_for('main.rank') }}">
+                        <span class="glyphicon glyphicon-sort-by-order"></span> Rank
+                    </a></li>
+                    <li><a href="{{ url_for('operation.compare') }}">
+                        <span class="glyphicon glyphicon-tasks"></span> Compare
+                    </a></li>
+                </ul>
+                <ul class="nav navbar-nav pull-right">
+                        <li class="dropdown">
+                        {% if current_user.is_authenticated %}
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                {% if current_user.photo %}
+                                    <img src="{{ current_user.photo }}" height="23" width="23">
+                                {% else %}
+                                    <img class="img-rounded profile-thumbnail"
+                                         src="../../static/avatars/default_avatar.jpg" height="23"
+                                         width="23">
+                                {% endif %}
+                                {{ current_user.username }} <b class="caret"></b>
+                            </a>
+
+                            <ul class="dropdown-menu">
+                                {% if current_user.login_type != 'website' %}
+                                    <li><a href="{{ url_for('operation.user', username=current_user.username) }}">Profile</a></li>
+{#                                    <li><a href="{{ url_for('operation.following', username=current_user.username)}}">Watching List</a></li>#}
+                                    <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
+                                {% else %}
+                                    <li><a href="{{ url_for('operation.user', username=current_user.username) }}">Profile</a></li>
+{#                                    <li><a href="{{ url_for('operation.following', username=current_user.username)}}">Watching List</a></li>#}
+                                    <li><a href="{{ url_for('operation.change_password') }}">Change password</a></li>
+                                    <li><a href="{{ url_for('auth.logout') }}">Log out</a></li>
+                                {% endif %}
+                            </ul>
+
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url }}">Log In</a></li>
+                    {% endif %}
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container -->
+    </nav>
+</header>
+
+<main role="main" id='#app' style="padding-top: 0px;">
+
+<div class="jumbotron" style="position: relative;">
+    <!-- button block start-->
+    <button class="compare-btn btn btn-primary" onclick="showModal();">
+        Compare
+    </button>
+    {% if current_user.is_anonymous %}
+        <a href="{{ url }}" class="follow-btn btn btn-primary">Follow</a>
+    {% else %}
+        {% if not current_user.is_following(school) %}
+            <button id="follow" onclick='ajax_follow("{{ school.place_id }}")'
+                    class="follow-btn btn btn-primary">Follow
+            </button>
+        {% else %}
+            <button id="follow" onclick='ajax_unfollow("{{ school.place_id }}")'
+                    class="follow-btn btn btn-primary">Unfollow
+            </button>
+        {% endif %}
+    {% endif %}
+
+    <script>
+
+    //-- Compare module Start ------------------------------------------------------------------------
+    function showModal() {
+
+        info = ajax_compare("{{ school.place_id }}");
+        if (info == "success") {
+            $("#myModal").modal();
+        }
+
+    };
+
+    function ajax_uncompare(name) {
+        req = $.ajax({
+            url: "/remove_comparison/" + name,
+            success: function (data) {
+                if (data.result == 'success') {
+                    //console.log("Removed!")
+                }
+            }
+        });
+
+        req.done();
+    }
+
+    function ajax_clearAll() {
+        req = $.ajax({
+            url: "/compare/clear_all",
+            success: function (data) {
+                if (data.result == 'success') {
+                    //console.log("Removed!")
+                }
+            }
+        });
+
+        req.done();
+    }
+
+    function remove(self) {
+        var li = $(self).parent().parent().parent();
+        //console.log(li.attr("id"));
+        ajax_uncompare(li.attr("id"));
+        li.remove();
+
+        if ($("#compare-list").children().length <= 0) {
+            $("#no-record").show();
+        }
+    }
+
+    function clearAll() {
+	var lis = $("#compare-list").children();
+	$.each(lis, function (i, val) {
+		//console.log(val.id);
+		val.remove();
+	});
+	ajax_clearAll();
+
+	if ($('#compare-list').children().length <= 0) {
+		$("#no-record").css('display', 'block');
+	}
+}
+
+    function ajax_follow(name) {
+        req = $.ajax({
+            url: "/follow/" + name,
+            success: function (data) {
+                if (data.result == 'success') {
+                    $("#follow").text("Unfollow")
+                    $("#follow").attr('onclick', 'ajax_unfollow("{{ school.place_id }}")')
+                }
+            }
+        });
+
+        req.done(function (data) {
+            $("#followers").fadeOut(500).fadeIn(500);
+            $("#followers").text(data.school_followers);
+
+        });
+    }
+
+
+    function ajax_unfollow(name) {
+        req1 = $.ajax({
+            url: "/unfollow/" + name,
+            success: function (data) {
+                if (data.result == 'success') {
+                    $("#follow").text("Follow");
+                    $("#follow").attr('onclick', 'ajax_follow("{{ school.place_id }}")')
+                }
+            }
+        });
+
+        req1.done(function (data) {
+            $("#followers").fadeOut(500).fadeIn(500);
+            $("#followers").text(data.school_followers);
+
+        });
+    }
+
+    function ajax_compare(name) {
+        req = $.ajax({
+            url: "/add_comparison/" + name,
+            success: function (data) {
+                //console.log(data.result);
+                if (data.result == 'success') {
+                    // data.increasable = 'True' or 'False'
+                    if (data.increasable == 'False') {
+                        $("#warning").show();
+                    } else {
+                        $("#warning").hide();
+                        // data.diverse = 'True'
+                        if (data.diverse == 'True') {
+                            $("#compare-list").append(
+                                '<li id="{{ school.place_id }}" class="list-group-item">' +
+                                '<div class="row">' +
+                                '<div class="col-sm-8">' +
+                                '{{ school.official_school_name }}' +
+                                '</div>' +
+                                '<div class="col-sm-4">' +
+                                '<button type="button" onclick="remove(this)" class="btn btn-default" data-dismiss="modal">' +
+                                'Remove' +
+                                '</button>' +
+                                '</div>' +
+                                '</div>' +
+                                '</li>'
+                            );
+                        }// -- end if
+                        if ($("#compare-list").children().length > 0) {
+                            $("#no-record").hide();
+                        }
+                    }
+                }// -- end if success
+            } // -- end success data
+        });
+        return "success";
+    };
+
+    </script>
+    <!-- button block end-->
+
+    <!-- content-->
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-6">
+                <h1>{{ school.official_school_name }}</h1>
+                {% if school.photo_ref2 %}
+                    <a href='#' id='view'>View more</a>
+                {% endif %} <br>
+
+                <!-- （Modal） -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title" id="myModalLabel">
+                                    Schools for Comparison
+                                </h4>
+                            </div><!--modal-header -->
+
+
+                            <div class="modal-body">
+                                <div id="no-record" style="display: none;"
+                                     class="alert alert-info alert-dismissable">
+                                    <button type="button" class="close" data-dismiss="alert"
+                                            aria-hidden="true">
+                                        &times;
+                                    </button>
+                                    No record added yet for comparisons.
+                                </div>
+
+                                <ul id="compare-list" class="list-group">
+                                    {% for school in school_names %}
+                                        <li id="{{ school }}" class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-sm-8">
+                                                    {{ school }}
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <button type="button" onclick="remove(this)"
+                                                            class="btn btn-default">
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+
+                                </ul>
+
+                                <div id="warning" style="display: none;"
+                                     class="alert alert-warning alert-dismissable">
+                                    <button type="button" class="close" data-dismiss="alert"
+                                            aria-hidden="true">
+                                        &times;
+                                    </button>
+                                    Warning: You can only add no more than 4 schools in your comparison list!
+                                </div>
+
+                            </div><!--modal-body -->
+
+
+                            <div class="modal-footer">
+                                <button type="button" onclick="clearAll()" class="btn btn-default">
+                                    Clear All
+                                </button>
+                                <button type="button" class="btn btn-primary"
+                                        onclick="window.open('{{ url_for('operation.compare') }}','_self')">
+                                    Compare
+                                </button>
+                            </div><!-- /.modal-footer -->
+
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </div><!-- myModal-->
+                <!-- Compare module End ------------------------------------------------------------------------->
+            </div><!-- col-sm 6 School name-->
+        </div><!-- col row-->
+    </div>
+
+</div><!-- jumbotron area end-->
+
+<div class="page-contents" >
+    <div class="row">
+        <div class="col-md-5">
+            <h3>{{ school.official_school_name }}</h3>
+            <p>
+                {% if current_user.is_anonymous %}
+                    <p><b><font color="navy">View: <span class="badge">{{ school.add }}</span></font></b></p>
+                {% else %}
+                    <b><font color="navy">Followers: </font></b>
+                    <span id="followers" class="badge">{{ school.followers.count() }}</span>
+                    <b><font color="navy">&nbsp;&nbsp;&nbsp;View: <span class="badge">{{ school.add }}</span></font></b>
+                {% endif %}
+            </p>
+            <p>{{ school.address }}</p>
+
+            <span class='rank'><p>Rank: {{ rank.rank }}</p></span>
+            <p>School gender: {{ school.school_gender }}</p>
+            <p>Religion: {{ school.religion }}</p>
+            <p>Irish classification: {{ school.irish_classification }}</p>
+            <p>Fee: {{ school.fee }}</p>
+            <p>Website: <a target="_blank" href="http://www.{{ school.website }}">www.{{ school.website }}/</a></p>
+            <p  style="display: inline-block">Award in 2018</p>
+            <button style="display: inline-block" data-toggle="modal" data-target="#awardModal">Details</button>
+
+            <!-- (Award Modal) -->
+            <div class="modal fade" id="awardModal" tabindex="-1" role="dialog" aria-labelledby="awardModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                Award in 2018
+                            </h4>
+                        </div><!--modal-header -->
+
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-1"></div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-striped table-bordered table-hover award" id="awardTablel" summary="Employee Pay Sheet">
+                                      <thead>
+                                          <tr>
+                                            <th scope="col">Award Title</th>
+                                            <th scope="col">Project Title</th>
+                                            <th scope="col">Project Category</th>
+                                            <th scope="col">Student(s)</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          {% if school.AwardTitle1 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle1 }}</td>
+                                                <td>{{ school.ProjectTitle1 }}</td>
+                                                <td>{{ school.ProjectCategory1 }}</td>
+                                                <td>{{ school.Student1 }}</td>
+                                              </tr>
+                                          {% else %}
+                                              <td colspan="4" style="text-align: center"> No Award Data </td>
+                                          {% endif %}
+
+                                          {% if school.AwardTitle2 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle2 }}</td>
+                                                <td>{{ school.ProjectTitle2 }}</td>
+                                                <td>{{ school.ProjectCategory2 }}</td>
+                                                <td>{{ school.Student2 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle3 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle3 }}</td>
+                                                <td>{{ school.ProjectTitle3 }}</td>
+                                                <td>{{ school.ProjectCategory3 }}</td>
+                                                <td>{{ school.Student3 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle4 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle4 }}</td>
+                                                <td>{{ school.ProjectTitle4 }}</td>
+                                                <td>{{ school.ProjectCategory4 }}</td>
+                                                <td>{{ school.Student4 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle5 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle5 }}</td>
+                                                <td>{{ school.ProjectTitle5 }}</td>
+                                                <td>{{ school.ProjectCategory5 }}</td>
+                                                <td>{{ school.Student5 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle6 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle6 }}</td>
+                                                <td>{{ school.ProjectTitle6 }}</td>
+                                                <td>{{ school.ProjectCategory6 }}</td>
+                                                <td>{{ school.Student6 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle7 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle7 }}</td>
+                                                <td>{{ school.ProjectTitle7 }}</td>
+                                                <td>{{ school.ProjectCategory7 }}</td>
+                                                <td>{{ school.Student7 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle8 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle8 }}</td>
+                                                <td>{{ school.ProjectTitle8 }}</td>
+                                                <td>{{ school.ProjectCategory8 }}</td>
+                                                <td>{{ school.Student8 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle9 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle9 }}</td>
+                                                <td>{{ school.ProjectTitle9 }}</td>
+                                                <td>{{ school.ProjectCategory9 }}</td>
+                                                <td>{{ school.Student9 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle10 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle10 }}</td>
+                                                <td>{{ school.ProjectTitle10 }}</td>
+                                                <td>{{ school.ProjectCategory10 }}</td>
+                                                <td>{{ school.Student10 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                          {% if school.AwardTitle11 %}
+                                              <tr>
+                                                <td>{{ school.AwardTitle11 }}</td>
+                                                <td>{{ school.ProjectTitle11 }}</td>
+                                                <td>{{ school.ProjectCategory11 }}</td>
+                                                <td>{{ school.Student11 }}</td>
+                                              </tr>
+                                          {% endif %}
+                                      </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div><!--modal-body -->
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                Close
+				            </button>
+                        </div><!-- /.modal-footer -->
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- myModal-->
+            <!-- Compare module End ------------------------------------------------------------------------->
+
+        </div>
+
+        <div class="col-md-7">
+            <div id="allmap" style="width: 100%;height: 300px; margin-top: 20px"></div>
+            <script type="text/javascript">
+                // Map
+                $(function () {
+                    initMap();
+                });
+
+                // Google Map
+                function initMap() {
+                    var myLatLng = {lat: {{ school.lat }}, lng: {{ school.lng }}};
+
+                    var map = new google.maps.Map(document.getElementById('allmap'), {
+                        zoom: 15,
+                        center: myLatLng,
+                        gestureHandling: 'greedy'
+                    });
+
+                    var marker = new google.maps.Marker({
+                        position: myLatLng,
+                        map: map,
+                        title: '{{ school.official_school_name }}'
+                    });
+                }
+
+
+            </script>
+        </div>
+
+    </div>
+
+    <div class="row stats">
+        <div class="col-sm-5">
+            <div id="tu1" style="width: 100%;height:500px;"></div>
+        </div>
+        <div class="col-sm-7">
+            <div id="tu2" style="width: 100%;height:480px;"></div>
+            <div class="row selectrow">
+                <div class="col-sm-1"></div>
+                <div class="col-sm-5">
+                    <select class="form-control" id='selyear'>
+                        <option value='2015'>2015</option>
+                        <option value='2016'>2016</option>
+                        <option value='2017'>2017</option>
+                    </select>
+                </div>
+
+                <div class="col-sm-5">
+                    <select class="form-control" id='seltype'>
+                        <option value='0'>All institution</option>
+                        <option value='1'>University only</option>
+                    </select>
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+
+        </div>
+    </div><!-- /.row -->
+</div><!-- /.container -->
+
+<div style="margin-left: 15px;">
+
+
+    <div class="row" >
+        <div class="col-md-1"></div>
+
+        <div class="col-md-10">
+        <br><hr>
+            <h3><span id="review-num">{{ count }} </span> Reviews  --- Overall Rank: <span id="rank-num"> {{overall_rate}} </span> </h3>
+
+            <!-- comments-->
+            <ul id="comment-list" class="media-list">
+
+            </ul>
+
+            <!--pagination -->
+            <div class="row">
+                <div class="col-md-4"></div>
+
+                <div id="pagination-row" class="row pagination-wrap col-md-6">
+                    <nav style="margin-left:20px" aria-label="Page navigation">
+                        <ul class="pagination" id="pagination"></ul>
+                    </nav>
+
+                </div><!-- /.row.pagination-wrap -->
+
+                <div class="col-md-2"></div>
+            </div>
+
+            <!-- review-form -->
+            <form id="review-form" role="form">
+                <h3>Ranking and Review </h3>
+                <div class="form-group">
+                     <input name="ranks" id="stars" value="2.5" type="number" class="rating rating-loading" min=0 max=5 step=0.1 data-size="xs">
+                </div>
+
+                <div class="form-group">
+                    <span class="input input--isao">
+                        <textarea style="border:1px solid darkgrey;border-radius:5px;" name="comment_content" placeholder="Your comments here" class="input__field input__field--isao form-control" type="text" rows="3"></textarea>
+                    </span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4">
+
+                    </div>
+                    <div class="col-md-4">
+                        <a id="addcommentbutton" href="javascript:void(0)" onclick="submitReviews()" type="button" class="btn btn-primary btn-block ladda-button" data-toggle="tooltip" data-placement="top" title="Please do not repeat submit!">
+                            <span class="ladda-label">
+                                Submit
+                            </span>
+                        </a>
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
+
+            </form>
+            <p></p>
+
+        </div><!-- col-md-9 end -->
+
+        <div class="col-md-2"></div>
+
+    </div><!-- row end -->
+</div>
+
+<div class="slider_contain">
+    <span class="slider_close">X</span>
+    <div id="jssor_1" style="display:none;position: relative; margin: 0 auto; top: 0px;z-index:9; left:0; width: 800px; height: 456px; overflow: hidden; visibility: hidden; background-color: #24262e;">
+        <!-- Loading Screen -->
+        <div data-u="loading" style="position: absolute; top: 0px; left: 0px;">
+            <div style="filter: alpha(opacity=90); opacity: 0.9; position: absolute; display: block; top: 0px; left: 0px; width: 100%; height: 100%;"></div>
+            <div style="position:absolute;display:block;top:0px;left:0px;width:100%;height:100%;"></div>
+        </div>
+        <div data-u="slides" style="cursor: default; position: relative; top: 0px; left:0;width: 800px; height: 356px; overflow: hidden;">
+
+            {% if school.photo_ref1 %}
+                <div data-p="144.50" style="display: none;">
+                    <img data-u="image"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img1/{{ school.official_school_name }}.jpeg"/>
+                    <img data-u="thumb"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img1/{{ school.official_school_name }}.jpeg"
+                         height="72px" width="72px">
+                </div>
+            {% endif %}
+
+            {% if school.photo_ref2 %}
+                <div data-p="144.50" style="display: none;">
+                    <img data-u="image"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img2/{{ school.official_school_name }}.jpeg"/>
+                    <img data-u="thumb"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img2/{{ school.official_school_name }}.jpeg"
+                         height="72px" width="72px"/>
+                </div>
+            {% endif %}
+
+            {% if school.photo_ref3 %}
+                <div data-p="144.50" style="display: none;">
+                    <img data-u="image"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img3/{{ school.official_school_name }}.jpeg"/>
+                    <img data-u="thumb"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img3/{{ school.official_school_name }}.jpeg"
+                         height="72px" width="72px"/>
+                </div>
+            {% endif %}
+
+            {% if school.photo_ref4 %}
+                <div data-p="144.50" style="display: none;">
+                    <img data-u="image"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img4/{{ school.official_school_name }}.jpeg"/>
+                    <img data-u="thumb"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img4/{{ school.official_school_name }}.jpeg"
+                         height="72px" width="72px"/>
+                </div>
+            {% endif %}
+
+            {% if school.photo_ref5 %}
+                <div data-p="144.50" style="display: none;">
+                    <img data-u="image"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img5/{{ school.official_school_name }}.jpeg"/>
+                    <img data-u="thumb"
+                         src="https://s3-eu-west-1.amazonaws.com/bestchoiceimage/school_img5/{{ school.official_school_name }}.jpeg"
+                         height="72px" width="72px"/>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Thumbnail Navigator -->
+        <div data-u="thumbnavigator" class="jssort01"
+             style="position:absolute;bottom:0px;left:0;width:800px;height:100px;" data-autocenter="1">
+            <!-- Thumbnail Item Skin Begin -->
+            <div data-u="slides" style="cursor: default;">
+                <div data-u="prototype" class="p">
+                    <div class="w">
+                        <div data-u="thumbnailtemplate" class="t"></div>
+                    </div>
+                    <div class="c"></div>
+                </div>
+            </div>
+            <!-- Thumbnail Item Skin End -->
+        </div>
+
+        <!-- Arrow Navigator -->
+        <span data-u="arrowleft" class="jssora05l" style="top:158px;left:8px;width:40px;height:40px;"></span>
+        <span data-u="arrowright" class="jssora05r" style="top:158px;right:8px;width:40px;height:40px;"></span>
+    </div>
+</div>
+
+</main>
+
+<!-- Comment -->
+<script>
+
+    var currentPage = 1;
+    var NumPerPage = 2;
+    var totalPage = 1;
+    var visiblePageNum = 1;
+    var domain = window.location.host;
+
+    var currentUserId = '{{ current_user.id }}'; // there should put data from server
+    var currentSchool = '{{ school.place_id }}';
+    var totalComments = initCommentData();
+
+    function initCommentData(){
+        var comments = [];
+        {% for comment in comments %}
+            var comment = {};
+            comment.author_avatar = '{{ comment.author_avatar }}';
+            comment.author_name = '{{ comment.author_name }}';
+            comment.user_rating = '{{ comment.user_rating }}';
+            comment.user_review = '{{ comment.user_review }}';
+            comment.time = '{{ comment.time }}';
+            comment.author_id = '{{ comment.author_id }}';
+            comments.push(comment);
+        {% endfor %}
+
+        if(comments.length == 0){
+            totalPage = 1;
+        } else{
+            totalPage = Math.ceil(comments.length / NumPerPage);
+        }
+
+        visiblePageNum = totalPage;
+
+        if(visiblePageNum > 5){
+            visiblePageNum = 5;
+        }
+
+        return comments;
+    };
+
+    $('#pagination').twbsPagination({
+        totalPages: totalPage,
+        visiblePages: visiblePageNum,
+        onPageClick: function (event, page) {
+            currentPage = page;
+            $("#comment-list").empty();
+            drawCommentCards(totalComments);
+        }
+    });
+
+    function drawSingleCommentCard(data, index){
+        var html = '';
+        if(data.author_avatar == "None"){
+            data.author_avatar = "../../static/avatars/default_avatar.jpg";
+        }
+
+        if(typeof(data) != 'undefined'){
+            html = html + '<div class="comment" number="'+ index +'">'+
+               '<li class="media">' +
+                    '<div class="media-left">' +
+                        '<a href="http://" + domain + "/user/'+ data.author_name +'">' +
+                            '<img class="media-object img-circle" style="height: 70px; width: 70px" src="'+ data.author_avatar +'" alt="photo">' +
+                        '</a>' +
+                    '</div>' +
+
+                    '<div class="media-body">' +
+                        '<h4 class="media-heading inline">'+ data.author_name +'</h4><span>  </span>' +
+
+                        '<div class="caption inline" ><span class="label label-success">'+ data.user_rating +' Stars</span></div>' +
+                        '<input value="'+ data.user_rating +'" type="number" class="rating-loading star-show" min=0 max=5 step=0.1 data-size="xs">' +
+
+                        '<p class="inline">'+ data.user_review +'</p><span>   </span>';
+
+            //console.log("author_id:"+data.author_id + "  currentUserId: "+ currentUserId);
+
+            if (data.author_id == currentUserId){
+
+                html = html +
+                        '<a class="inline" href="javascript:void(0)" onclick="removeComment(this)">' +
+                            '<div class="caption inline" ><span class="label label-danger">Remove</span></div>' +
+                        '</a>';
+            }
+
+            html = html +
+                        '<p>' +
+                            '<div class="ds-comment-footer">' +
+                                '<span class="ds-time" title="'+ data.time +'">'+ data.time +'</span>&nbsp;'+
+                            '</div>'+
+                        '</p>' +
+                    '</div>' +
+                '</li>' +
+                '<hr/></div>';
+        }
+
+        return html;
+    }
+
+    function drawCommentCards(datas){
+        //console.log("function drawCommentCards: currentpage: " + currentPage);
+        //console.log("function drawCommentCards: Data: " );
+        //console.log(datas);
+
+        for (var i = (currentPage-1)*NumPerPage; i < currentPage*NumPerPage; i++) {
+
+            if(i < datas.length){
+               $("#comment-list").append(drawSingleCommentCard(datas[i], i));
+            }
+        }
+
+        $(".star-show").rating({displayOnly: true});
+    }
+
+    function removeComment(obj){
+
+        if(confirm("Are you sure to delete this comment?")){
+
+            req = $.ajax({
+                type: 'POST',
+                url: "http://" + domain + "/remove_comment/"+ currentSchool,
+                contentType: 'application/json; charset=UTF-8',
+                dataType: 'json',
+                success: function (data) {
+
+                        totalComments = data.comments;
+                        //console.log("ajax removeComment data:");
+                        //console.log(data);
+                        //console.log(totalComments);
+
+                        currentPage = 1;
+                        $("#comment-list").empty();
+                        drawCommentCards(totalComments);
+
+                        if(totalComments.length != 0){
+                            totalPage = Math.ceil(totalComments.length / NumPerPage);
+                        }else{
+                            totalPage = 1;
+                        }
+
+                        $("#review-num").html(totalComments.length);
+                        //console.log("remove overall_rate: "+ data.overall_rate);
+                        $("#rank-num").html(data.overall_rate.toFixed(2));
+
+                        // page overloaded with empty split page data (belonging to the paging plug-in)
+                        $('#pagination').empty();
+                        $('#pagination').removeData("twbs-pagination");
+                        $('#pagination').unbind('page');
+
+                        $('#pagination').twbsPagination({
+                            totalPages: totalPage,
+                            visiblePages: visiblePageNum,
+                            onPageClick: function (event, page) {
+                                currentPage = page;
+                                $("#comment-list").empty();
+                                drawCommentCards(totalComments);
+
+                                //console.log("removeComment: ");
+                                //console.log("totalPage: "+ totalPage + "  currentPage: "+currentPage);
+                            }
+                        });
+
+                        $("[data-toggle='tooltip']").tooltip('disable');
+
+                }
+            });
+
+        }
+    }
+
+    function submitReviews(){
+
+        if (currentUserId != ''){
+            var initialData = $("#review-form").serialize();
+            var formData = decodeURIComponent(initialData,true);
+            //console.log("submitReviews formData: ");
+            //console.log(formData);
+
+
+            var str1 = formData.split("&");
+            var json = {};
+            for(var i = 0; i < str1.length; i++){
+                var str2 = str1[i].split("=");
+                json[str2[0]] = str2[1];
+            }
+            //console.log(json);
+
+            $.ajax({
+            type: 'POST',
+            url: "http://" + domain +'/add_comment/'+ currentSchool,
+            contentType: 'application/json; charset=UTF-8',
+            data: JSON.stringify(json),
+            dataType: 'json',
+            success: function (data) {
+
+                var flag = data.has_commented;
+
+                if(!flag){
+                    $("#review-form")[0].reset();
+                    totalComments = data.comment_list; //Ordering in Time
+
+                    //console.log("ajax submitReviews data:");
+                    //console.log(data);
+                    //console.log(totalComments);
+
+                    //reload data and pagination
+                    currentPage = 1;
+                    $("#comment-list").empty();
+                    drawCommentCards(totalComments);
+
+                    totalPage = Math.ceil(totalComments.length / NumPerPage);
+                    $("#review-num").html(totalComments.length);
+
+                    //console.log("submit overall_rate: "+ data.overall_rate);
+                    $("#rank-num").html(data.overall_rate.toFixed(2));
+
+                    // page overloaded with empty split page data (belonging to the paging plug-in)
+                    $('#pagination').empty();
+                    $('#pagination').removeData("twbs-pagination");
+                    $('#pagination').unbind('page');
+
+                    $('#pagination').twbsPagination({
+                        totalPages: totalPage,
+                        visiblePages: visiblePageNum,
+                        onPageClick: function (event, page) {
+                            currentPage = page;
+                            $("#comment-list").empty();
+                            drawCommentCards(totalComments);
+                        }
+                    });
+
+                }else{
+                    $("[data-toggle='tooltip']").tooltip("enable");
+                    $("[data-toggle='tooltip']").tooltip("show");
+                }
+
+            }
+        });
+        } else if(currentUserId == ''){
+            window.location.href = "http://" + domain +"{{ url }}";
+        }
+
+    }
+
+</script>
+
+<!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+<script>
+    var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
+    (function (d, t) {
+        var g = d.createElement(t), s = d.getElementsByTagName(t)[0];
+        g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g, s)
+    }(document, 'script'));
+</script>
+
+<!-- Chart draw-->
+<script >
+    //Initialize the echarts instance based on the prepared dom
+    var myChart = echarts.init(document.getElementById('tu1'));
+    // display the title, legend and empty coordinate axes
+    myChart.setOption({
+        title: {
+          text:'School-to-institution/university progression',x:'left'
+        },
+        tooltip: {trigger: 'axis'},
+        legend: {
+          y : '93%',
+          orient : 'vertical',
+          align:'left',
+          data:[,"Progression to univerity only","Total Progression"]
+        },
+        xAxis: {
+          //type: 'category',
+          //boundaryGap: false,
+          data: ['2015','2016','2017']
+        },
+        yAxis: {type:'value'},
+        series: [
+            {
+                name:"Progression to univerity only",
+                type:'bar',
+                data:[{{ computing_rate2015 }}, {{ computing_rate2016 }}, {{ computing_rate2017 }}]
+            },
+            {
+                name:"Total Progression",
+                type:'bar',
+                data:[{{ university_going.Total_progression }}, {{ university_going1.Total_progression }}, {{ university_going2.Total_progression }}]
+            },]
+    });
+
+    var myChart2 = echarts.init(document.getElementById('tu2'));
+    var dataList = {
+            2015: [
+                {
+                    {% if university_going %}
+                        name: ['UCD', 'TCD', 'DCU', 'UL', 'Maynooth University', 'NUIG', 'UCC', 'St Angela', 'QUB', 'UU', 'Blanch IT', 'Nat_Col_of_Irl',
+                            'DIT', 'Tallaght IT', 'Athlone IT', 'Cork IT', 'Dundalk IT', 'GMIT', 'IADT', 'IT Carlow',
+                            'IT Sligo', 'IT Tralee', 'IT Letter kenny', 'IT_Limerick', 'WIT', 'Marino_Instit_of_Ed',
+                            'C_of_I_College_of_Ed', 'Mary_Immac', 'NCAD', 'RCSI', 'Shannon College of Hotel Management'],
+                        data: ['UCD', 'TCD', 'DCU', 'UL', 'Maynooth University', 'NUIG', 'UCC', 'St Angela', 'QUB', 'UU', 'Blanch IT', 'Nat_Col_of_Irl',
+                            'DIT', 'Tallaght IT', 'Athlone IT', 'Cork IT', 'Dundalk IT', 'GMIT', 'IADT', 'IT Carlow',
+                            'IT Sligo', 'IT Tralee', 'IT Letter kenny', 'IT_Limerick', 'WIT', 'Marino_Instit_of_Ed',
+                            'C_of_I_College_of_Ed', 'Mary_Immac', 'NCAD', 'RCSI', 'Shannon College of Hotel Management',
+                            {value: {{ university_going.UCD }}, name: 'UCD'},
+                            {value: {{ university_going.TCD }}, name: 'TCD'},
+                            {value: {{ university_going.DCU }}, name: 'DCU'},
+                            {value: {{ university_going.UL }}, name: 'UL'},
+                            {value: {{ university_going.Maynooth_University }}, name: 'Maynooth University'},
+                            {value: {{ university_going.NUIG }}, name: 'NUIG'},
+                            {value: {{ university_going.UCC }}, name: 'UCC'},
+                            {value: {{ university_going.St_Angela }}, name: 'St Angela'},
+                            {value: {{ university_going.QUB }}, name: 'QUB'},
+                            {value: {{ university_going.UU }}, name: 'UU'},
+                            {value: {{ university_going.Blanch_IT }}, name: 'Blanch IT'},
+                            {value: {{ university_going.Nat_Col_of_Irl }}, name: 'Nat_Col_of_Irl'},
+                            {value: {{ university_going.DIT }}, name: 'DIT'},
+                            {value: {{ university_going.Tallaght_IT }}, name: 'Tallaght IT'},
+                            {value: {{ university_going.Athlone_IT }}, name: 'Athlone IT'},
+                            {value: {{ university_going.Cork_IT }}, name: 'Cork IT'},
+                            {value: {{ university_going.Dundalk_IT }}, name: 'Dundalk IT'},
+                            {value: {{ university_going.GMIT }}, name: 'GMIT'},
+                            {value: {{ university_going.IADT }}, name: 'IADT'},
+                            {value: {{ university_going.IT_Carlow }}, name: 'IT Carlow'},
+                            {value: {{ university_going.IT_Sligo }}, name: 'IT Sligo'},
+                            {value: {{ university_going.IT_Tralee }}, name: 'IT Tralee'},
+                            {value: {{ university_going.IT_Letter_kenny }}, name: 'IT Letter kenny'},
+                            {value: {{ university_going.IT_Limerick }}, name: 'IT Limerick'},
+                            {value: {{ university_going.WIT }}, name: 'WIT'},
+                            {value: {{ university_going.Marino_Instit_of_Ed }}, name: 'Marino_Instit_of_Ed'},
+                            {value: {{ university_going.C_of_I_College_of_Ed }}, name: 'C_of_I_College_of_Ed'},
+                            {value: {{ university_going.Mary_Immac }}, name: 'Mary_Immac'},
+                            {value: {{ university_going.NCAD }}, name: 'NCAD'},
+                            {value: {{ university_going.RCSI }}, name: 'RCSI'},
+                            {
+                                value: {{ university_going.Shannon_College_of_Hotel_Management }},
+                                name: 'Shannon College of Hotel Management'
+                            },
+                        ],
+                    {% else %}
+                        name: [''],
+                        data: ['',
+                            {value: 0, name: 'No Information'}]
+                    {% endif %}
+                },
+
+                {
+                    {% if university_going %}
+                        name: ['UCD', 'TCD', 'DCU', 'UCC', 'UL', 'Maynooth University', 'NUIG'],
+                        data: [
+                            'UCD', 'TCD', 'DCU', 'UCC', 'UL', 'Maynooth University', 'NUIG',
+                            {value: {{ university_going.UCD }}, name: 'UCD'},
+                            {value: {{ university_going.TCD }}, name: 'TCD'},
+                            {value: {{ university_going.DCU }}, name: 'DCU'},
+                            {value: {{ university_going.UL }}, name: 'UL'},
+                            {value: {{ university_going.UCC }}, name: 'UCC'},
+                            {value: {{ university_going.Maynooth_University }}, name: 'Maynooth University'},
+                            {value: {{ university_going.NUIG }}, name: 'NUIG'},
+                        ],
+                    {% else %}
+                        name: [''],
+                        data: ['',
+                            {value: 0, name: 'No Information'}]
+                    {% endif %}
+                },
+            ],
+            2016: [
+                {
+                    {% if university_going1 %}
+                        name: ['UCD', 'TCD', 'DCU', 'UL', 'Maynooth University', 'NUIG', 'UCC', 'St Angela', 'QUB', 'UU', 'Blanch IT', 'Nat_Col_of_Irl',
+                            'DIT', 'Tallaght IT', 'Athlone IT', 'Cork IT', 'Dundalk IT', 'GMIT', 'IADT', 'IT Carlow',
+                            'IT Sligo', 'IT Tralee', 'IT Letter kenny', 'IT_Limerick', 'WIT', 'Marino_Instit_of_Ed',
+                            'Mary_Immac', 'Mary_Immac', 'NCAD', 'RCSI', 'Shannon College of Hotel Management'],
+                        data: ['UCD', 'TCD', 'DCU', 'UL', 'Maynooth University', 'NUIG', 'UCC', 'St Angela', 'QUB', 'UU', 'Blanch IT', 'Nat_Col_of_Irl',
+                            'DIT', 'Tallaght IT', 'Athlone IT', 'Cork IT', 'Dundalk IT', 'GMIT', 'IADT', 'IT Carlow',
+                            'IT Sligo', 'IT Tralee', 'IT Letter kenny', 'IT_Limerick', 'WIT', 'Marino_Instit_of_Ed',
+                            'Mary_Immac', 'NCAD', 'RCSI',
+                            {value: {{ university_going1.UCD }}, name: 'UCD'},
+                            {value: {{ university_going1.TCD }}, name: 'TCD'},
+                            {value: {{ university_going1.DCU }}, name: 'DCU'},
+                            {value: {{ university_going1.UL }}, name: 'UL'},
+                            {value: {{ university_going1.Maynooth_University }}, name: 'Maynooth University'},
+                            {value: {{ university_going1.NUIG }}, name: 'NUIG'},
+                            {value: {{ university_going1.UCC }}, name: 'UCC'},
+                            {value: {{ university_going1.St_Angela }}, name: 'St Angela'},
+                            {value: {{ university_going1.QUB }}, name: 'QUB'},
+                            {value: {{ university_going1.UU }}, name: 'UU'},
+                            {value: {{ university_going1.Blanch_IT }}, name: 'Blanch IT'},
+                            {value: {{ university_going1.Nat_Col_of_Irl }}, name: 'Nat_Col_of_Irl'},
+                            {value: {{ university_going1.DIT }}, name: 'DIT'},
+                            {value: {{ university_going1.Tallaght_IT }}, name: 'Tallaght IT'},
+                            {value: {{ university_going1.Athlone_IT }}, name: 'Athlone IT'},
+                            {value: {{ university_going1.Cork_IT }}, name: 'Cork IT'},
+                            {value: {{ university_going1.Dundalk_IT }}, name: 'Dundalk IT'},
+                            {value: {{ university_going1.GMIT }}, name: 'GMIT'},
+                            {value: {{ university_going1.IADT }}, name: 'IADT'},
+                            {value: {{ university_going1.IT_Carlow }}, name: 'IT Carlow'},
+                            {value: {{ university_going1.IT_Sligo }}, name: 'IT Sligo'},
+                            {value: {{ university_going1.IT_Tralee }}, name: 'IT Tralee'},
+                            {value: {{ university_going1.IT_Letter_kenny }}, name: 'IT Letter kenny'},
+                            {value: {{ university_going1.IT_Limerick }}, name: 'IT Limerick'},
+                            {value: {{ university_going1.WIT }}, name: 'WIT'},
+                            {value: {{ university_going1.Marino_Instit_of_Ed }}, name: 'Marino_Instit_of_Ed'},
+                            {value: {{ university_going1.Mary_Immac }}, name: 'Mary_Immac'},
+                            {value: {{ university_going1.NCAD }}, name: 'NCAD'},
+                            {value: {{ university_going1.RCSI }}, name: 'RCSI'},
+
+                        ],
+                    {% else %}
+                        name: [''],
+                        data: ['',
+                            {value: 0, name: 'No Information'}]
+                    {% endif %}
+                },
+                {
+                    {% if university_going1 %}
+                        name: ['UCD', 'TCD', 'DCU', 'UCC', 'UL', 'Maynooth University', 'NUIG'],
+                        data: [
+                            'UCD', 'TCD', 'DCU', 'UCC', 'UL', 'Maynooth University', 'NUIG',
+                            {value: {{ university_going1.UCD }}, name: 'UCD'},
+                            {value: {{ university_going1.TCD }}, name: 'TCD'},
+                            {value: {{ university_going1.DCU }}, name: 'DCU'},
+                            {value: {{ university_going1.UL }}, name: 'UL'},
+                            {value: {{ university_going1.UCC }}, name: 'UCC'},
+                            {value: {{ university_going1.Maynooth_University }}, name: 'Maynooth University'},
+                            {value: {{ university_going1.NUIG }}, name: 'NUIG'},
+                        ],
+                    {% else %}
+                        name: [''],
+                        data: ['',
+                            {value: 0, name: 'No Information'}]
+                    {% endif %}
+                },
+            ],
+            2017: [
+                {
+                    {% if university_going2 %}
+                        name: ['UCD', 'TCD', 'DCU', 'UL'
+                            , 'Maynooth University', 'NUIG', 'UCC', 'St Angela', 'QUB', 'UU', 'Blanch IT', 'Nat_Col_of_Irl'
+                            ,
+                            'DIT', 'Tallaght IT', 'Athlone IT', 'Cork IT', 'Dundalk IT', 'GMIT', 'IADT', 'IT Carlow'
+                            , 'IT Sligo', 'IT Tralee', 'IT Letter kenny', 'IT_Limerick', 'WIT', 'Marino_Instit_of_Ed',
+                            'Mary_Immac'
+                            , 'NCAD'
+                            , 'RCSI'
+                            {#, 'GC'#}
+                            {#, 'Dublin_B_school'#}
+                            {#,'ICHASciences'#}
+                        ],
+                        data: ['UCD', 'TCD', 'DCU', 'UL',
+                            'Maynooth University', 'NUIG', 'UCC', 'St Angela', 'QUB', 'UU', 'Blanch IT', 'Nat_Col_of_Irl',
+                            'DIT', 'Tallaght IT', 'Athlone IT', 'Cork IT', 'Dundalk IT', 'GMIT', 'IADT', 'IT Carlow',
+                            'IT Sligo', 'IT Tralee', 'IT Letter kenny', 'IT_Limerick', 'WIT', 'Marino_Instit_of_Ed',
+                            'Mary_Immac',
+                            'NCAD',
+                            'RCSI',
+                            {#'GC',#}
+                            {#'Dublin_B_school',#}
+                            {#'ICHASciences',#}
+                            {value: {{ university_going2.UCD }}, name: 'UCD'},
+                            {value: {{ university_going2.TCD }}, name: 'TCD'},
+                            {value: {{ university_going2.DCU }}, name: 'DCU'},
+                            {value: {{ university_going2.UL }}, name: 'UL'},
+                            {value: {{ university_going2.Maynooth_University }}, name: 'Maynooth University'},
+                            {value: {{ university_going2.NUIG }}, name: 'NUIG'},
+                            {value: {{ university_going2.UCC }}, name: 'UCC'},
+                            {value: {{ university_going2.St_Angela }}, name: 'St Angela'},
+                            {value: {{ university_going2.QUB }}, name: 'QUB'},
+                            {value: {{ university_going2.UU }}, name: 'UU'},
+                            {value: {{ university_going2.Blanch_IT }}, name: 'Blanch IT'},
+                            {value: {{ university_going2.Nat_Col_of_Irl }}, name: 'Nat_Col_of_Irl'},
+                            {value: {{ university_going2.DIT }}, name: 'DIT'},
+                            {value: {{ university_going2.Tallaght_IT }}, name: 'Tallaght IT'},
+                            {value: {{ university_going2.Athlone_IT }}, name: 'Athlone IT'},
+                            {value: {{ university_going2.Cork_IT }}, name: 'Cork IT'},
+                            {value: {{ university_going2.Dundalk_IT }}, name: 'Dundalk IT'},
+                            {value: {{ university_going2.GMIT }}, name: 'GMIT'},
+                            {value: {{ university_going2.IADT }}, name: 'IADT'},
+                            {value: {{ university_going2.IT_Carlow }}, name: 'IT Carlow'},
+                            {value: {{ university_going2.IT_Sligo }}, name: 'IT Sligo'},
+                            {value: {{ university_going2.IT_Tralee }}, name: 'IT Tralee'},
+                            {value: {{ university_going2.IT_Letter_kenny }}, name: 'IT Letter kenny'},
+                            {value: {{ university_going2.IT_Limerick }}, name: 'IT Limerick'},
+                            {value: {{ university_going2.WIT }}, name: 'WIT'},
+                            {value: {{ university_going2.Marino_Instit_of_Ed }}, name: 'Marino_Instit_of_Ed'},
+                            {value: {{ university_going2.Mary_Immac }}, name: 'Mary_Immac'},
+                            {value: {{ university_going2.NCAD }}, name: 'NCAD'},
+                            {value: {{ university_going2.RCSI }}, name: 'RCSI'},
+                            {#{value: {{ university_going2.GC }}, name: 'GC'},#}
+                            {#{value: {{ university_going2.Dublin_B_school }}, name: 'Dublin_B_school'},#}
+                            {#{value: {{ university_going2.ICHASciences }}, name: 'ICHASciences'},#}
+                        ],
+                    {% else %}
+                        name: [''],
+                        data: ['',
+                            {value: 0, name: 'No Information'}]
+                    {% endif %}
+                },
+                {
+                    {% if university_going2 %}
+                        name: ['UCD', 'TCD', 'DCU', 'UCC', 'UL', 'Maynooth University', 'NUIG'],
+                        data: [
+                            'UCD', 'TCD', 'DCU', 'UCC', 'UL', 'Maynooth University', 'NUIG',
+                            {value: {{ university_going2.UCD }}, name: 'UCD'},
+                            {value: {{ university_going2.TCD }}, name: 'TCD'},
+                            {value: {{ university_going2.DCU }}, name: 'DCU'},
+                            {value: {{ university_going2.UL }}, name: 'UL'},
+                            {value: {{ university_going2.UCC }}, name: 'UCC'},
+                            {value: {{ university_going2.Maynooth_University }}, name: 'Maynooth University'},
+                            {value: {{ university_going2.NUIG }}, name: 'NUIG'},
+                        ],
+                    {% else %}
+                        name: [''],
+                        data: ['',
+                            {value: 0, name: 'No Information'}]
+                    {% endif %}
+                },
+            ],
+    };
+
+    var selYear = '2015', selType = 0;
+
+    var option2 = {
+            title: {
+                x: 'left',//
+                text: "Institution School",
+                textStyle: {
+                    fontSize: 16,
+                    fontWeight: 'bold'
+                }
+            },
+            tooltip: {
+                show: 'false',
+                trigger: 'item',
+                formatter: "{a} <br/>{b}: {c} ({d}%)"
+            },
+            legend: {
+                orient: 'vertical',
+                icon: 'circle',
+                itemGap: 3,
+                itemWidth: 4,
+                x: '80%',
+                align: 'left',
+                textStyle: {//属性名的字体样式设置
+                    fontSize: 10,
+                    color: '#666'
+                },
+                data: dataList[selYear][selType].name
+            },
+            series: [
+                {
+                    name: 'Access to the source',
+                    type: 'pie',
+                    radius: ['30%', '70%'],
+                    avoidLabelOverlap: false,
+                    label: {
+                        normal: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            show: true,
+                            textStyle: {
+                                fontSize: '15',
+                                fontWeight: 'bold'
+                            }
+                        }
+                    },
+                    labelLine: {
+                        normal: {
+                            show: false
+                        }
+                    },
+                    data: dataList[selYear][selType].data
+                }
+            ]
+    };
+    myChart2.setOption(option2);
+
+    $("#selyear").change(function () {
+        selYear = $("#selyear").val();
+
+        option2.legend.data = dataList[selYear][selType].name;
+        option2.series[0].data = dataList[selYear][selType].data;
+        myChart2.setOption(option2);
+    });
+
+    $("#seltype").change(function () {
+        selType = parseInt($("#seltype").val());
+        //console.log('selYear', $("#seltype").val());
+        //console.log('selYear', dataList[selYear][selType]);
+        option2.legend.data = dataList[selYear][selType].name;
+        option2.series[0].data = dataList[selYear][selType].data;
+        myChart2.setOption(option2);
+    });
+
+</script>
+
+</body>
+</html>
+
