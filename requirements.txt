@@ -39,7 +39,7 @@ google-images-download==2.3.0
 googlemaps==2.5.1
 html5lib==1.0.1
 httpie==0.9.9
-httplib2==0.11.3
+httplib2==0.18.0
 idna==2.6
 imagesize==1.0.0
 itsdangerous==0.24
